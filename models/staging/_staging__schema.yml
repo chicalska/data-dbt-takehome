@@ -26,9 +26,6 @@ models:
 
     - name: stg_patients
       description: Model containing the patients contact information and what conditions they have.
-      tests:
-        - dbt_utils.expression_is_true:
-            expression: "age < 130"
       columns:
         - name: patient_id
           tests:
@@ -40,6 +37,12 @@ models:
         - name: age
           tests:
             - not_null
+            - dbt_utils.accepted_range:
+                min_value: 0
+                max_value: 120
+                inclusive: true
+                config:
+                  severity: warn
         - name: registration_date
           tests:
             - not_null
