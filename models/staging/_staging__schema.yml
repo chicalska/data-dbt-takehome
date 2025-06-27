@@ -1,0 +1,81 @@
+version: 2
+
+models:
+
+    - name: stg_activities
+      description: Model containing the patients contact information and what conditions they have.
+      columns:
+        - name: activity_id
+          tests:
+            - not_null
+            - unique
+        - name: patient_id
+          tests:
+            - not_null
+        - name: activity_type
+          tests:
+            - not_null
+            - accepted_values:
+                values: ['consultation', 'lab_test', 'edge_case', 'after_hours', 'intro_call', 'prescription']
+        - name: duration_minutes
+          tests:
+            - dbt_utils.accepted_range:
+                min_value: 0
+                inclusive: true
+
+
+    - name: stg_patients
+      description: Model containing the patients contact information and what conditions they have.
+      columns:
+        - name: patient_id
+          tests:
+            - not_null
+            - unique
+        - name: practice_id
+          tests:
+            - not_null
+        - name: age
+          tests:
+            - not_null
+            - dbt_utils.accepted_range:
+                min_value: 0
+                max_value: 120
+                inclusive: true
+                config:
+                  severity: warn
+        - name: registration_date
+          tests:
+            - not_null
+
+
+    - name: stg_practices
+      description: Model containing primary care practices information that patients belong to.
+      tests:
+        - dbt_utils.expression_is_true:
+            expression: "established_date <= CURRENT_DATE()"
+      columns:
+        - name: practice_id
+          tests:
+            - not_null
+            - unique
+        - name: practice_name
+          tests:
+            - not_null
+        - name: location
+          tests:
+            - not_null
+        - name: primary_care_network_id
+          tests:
+            - not_null
+
+
+    - name: stg_primary_care_networks
+      description: Model containing IDs and names of the Primary Care Networks that the practices belong to. 
+      columns:
+        - name: primary_care_network_id
+          tests:
+            - not_null
+            - unique
+        - name: primary_care_network_name
+          tests:
+            - not_null

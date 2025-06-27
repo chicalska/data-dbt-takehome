@@ -27,7 +27,7 @@ models:
   data_takehome:
     materialized: table
     staging:
-      materialized: view
+      materialized: table
       +docs:
         node_color: 'silver'
     +docs:
